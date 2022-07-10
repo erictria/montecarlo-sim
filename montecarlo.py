@@ -42,10 +42,10 @@ class Game:
                 roll_result = {
                     'roll_number': i + 1,
                     'die_number': idx,
-                    'result_face': r
+                    'face_value': r
                 }
                 roll_results.append(roll_result)
-        self.__play_result = pd.DataFrame(roll_results).set_index('roll_number')
+        self.__play_result = pd.DataFrame(roll_results).sort_values(['roll_number']).set_index('roll_number')
     
     def show_play_results(self, form = 'wide'):
         if form == 'wide':
@@ -61,34 +61,59 @@ class Analyzer:
     
     def jackpot(self):
         play_results = self.game.show_play_results()
-        roll_unique_faces = play_results.groupby('roll_number')['result_face'].nunique()
+        roll_unique_faces = play_results.groupby('roll_number')['face_value'].nunique()
         jackpot_results = []
         for i, r in roll_unique_faces.items():
             jackpot_results.append({
                 'roll_number': i,
                 'jackpot': 1 if r == 1 else 0
             })
-        self.jackpots = pd.DataFrame(jackpot_results)
+        self.jackpots = pd.DataFrame(jackpot_results).set_index('roll_number')
+        print(self.jackpots)
         return self.jackpots.jackpot.sum()
     
-    # def combo(self):
+    def combo(self):
+        # check if die order matters
+        play_results = self.game.show_play_results()
+        grouped = play_results.groupby('roll_number')['face_value'].agg(lambda x: sorted(list(x)))
+
+        num_dice = len(self.game.dice)
+        index_names = []
+        for i in range(0, num_dice):
+            index_names.append('face_{}'.format(i + 1))
+        
+        combos_df = pd.DataFrame(grouped.values.tolist(), columns = index_names)
+        combos_df['count'] = 1
+        self.combos = combos_df.groupby(index_names).sum()
+        print(self.combos)
+    
+    def face_count(self):
+        # check if need to add the 0s
+        play_results = self.game.show_play_results()
+        self.face_count = play_results.groupby(['roll_number', 'face_value'])\
+            .count().reset_index()\
+                .rename(columns = {'die_number': 'count'}).set_index('roll_number')
+        print(self.face_count)
 
 
 
 
 if __name__ == '__main__':
     sample_die = Die(faces = ['a', 'b', 'c'])
-    # print(sample_die.roll(5))
-    # print(sample_die.show_sides())
-    # sample_die.change_weight(face = 5, weight = 3)
-    # sample_die.change_weight(face = 'c', weight = 'z')
-    sample_die.change_weight(face = 'c', weight = 3.5)
-    # print(sample_die.show_sides())
-
+    sample_die.change_weight(face = 'c', weight = 2.5)
     sample_die_2 = Die(faces = ['a', 'b', 'c'])
+
     game = Game([sample_die, sample_die_2])
     game.play(rolls = 2)
-    # print(game.show_play_results('narrow'))
-    # print(game.show_play_results('widez'))
+
+    print('---- play results narrow ----')
+    print(game.show_play_results('narrow'))
+    print('---- play results wide ----')
+    print(game.show_play_results('wide'))
     analyzer = Analyzer(game)
-    print(analyzer.jackpot())
+    print('---- combo ----')
+    analyzer.combo()
+    print('---- face count ----')
+    analyzer.face_count()
+    print('---- jackpot ----')
+    analyzer.jackpot()
