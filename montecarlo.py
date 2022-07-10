@@ -88,11 +88,23 @@ class Analyzer:
         print(self.combos)
     
     def face_count(self):
-        # check if need to add the 0s
+        faces = self.game.dice[0].sides.face.values.tolist() # move this to a cleaner place
         play_results = self.game.show_play_results()
-        self.face_count = play_results.groupby(['roll_number', 'face_value'])\
+
+        all_faces = []
+        for i in play_results.index.unique().tolist():
+            for face in faces:
+                all_faces.append({
+                    'roll_number': i,
+                    'face_value': face
+                })
+        all_faces_df = pd.DataFrame(all_faces).set_index('roll_number')
+
+        face_counts_df = play_results.groupby(['roll_number', 'face_value'])\
             .count().reset_index()\
                 .rename(columns = {'die_number': 'count'}).set_index('roll_number')
+        
+        self.face_count = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left').fillna(0).astype({'count': 'int32'})
         print(self.face_count)
 
 
