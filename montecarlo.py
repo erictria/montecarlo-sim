@@ -70,7 +70,7 @@ class Analyzer:
             })
         self.jackpots = pd.DataFrame(jackpot_results).set_index('roll_number')
         print(self.jackpots)
-        return self.jackpots.jackpot.sum()
+        return self.jackpots.jackpot.sum().item()
     
     def combo(self):
         # check if die order matters
@@ -85,9 +85,8 @@ class Analyzer:
         combos_df = pd.DataFrame(grouped.values.tolist(), columns = index_names)
         combos_df['count'] = 1
         self.combos = combos_df.groupby(index_names).sum()
-        print(self.combos)
     
-    def face_count(self):
+    def face_counts_per_roll(self):
         faces = self.game.dice[0].sides.face.values.tolist() # move this to a cleaner place
         play_results = self.game.show_play_results()
 
@@ -104,11 +103,7 @@ class Analyzer:
             .count().reset_index()\
                 .rename(columns = {'die_number': 'count'}).set_index('roll_number')
         
-        self.face_count = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left').fillna(0).astype({'count': 'int32'})
-        print(self.face_count)
-
-
-
+        self.face_counts = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left').fillna(0).astype({'count': 'int32'})
 
 if __name__ == '__main__':
     sample_die = Die(faces = ['a', 'b', 'c'])
@@ -126,6 +121,6 @@ if __name__ == '__main__':
     print('---- combo ----')
     analyzer.combo()
     print('---- face count ----')
-    analyzer.face_count()
+    analyzer.face_counts_per_roll()
     print('---- jackpot ----')
     analyzer.jackpot()
