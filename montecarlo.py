@@ -1,54 +1,110 @@
 import pandas as pd
 
 class Die:
+    '''
+    Python class to replicate a die. A die has N faces, each with a defined weight. 
+    Each face defaults to a weight of 1.0
+
+    ATTRIBUTES:
+    default_weight - float value for the default weight for each face
+    __sides - private pandas dataframe containing the faces and weights of the die. Columns: ['face', 'weight']
+    '''
     default_weight = 1.0
 
     def __init__(self, faces):
-        # check if need to validate faces
-        self.sides = pd.DataFrame({
+        self.__sides = pd.DataFrame({
             'face': faces,
             'weight': [self.default_weight] * len(faces)
         })
     
     def change_weight(self, face, weight):
-        if face in self.sides['face'].values:
+        '''
+        PURPOSE: changes the weight of a face of the die object
+
+        INPUTS
+        face - str or numeric; must match the current faces in the die
+        weight - int or float
+        '''
+        if face in self.__sides['face'].values:
             if isinstance(weight, int) or isinstance(weight, float):
                 float_weight = float(weight)
-                self.sides['weight'] = self.sides[['face', 'weight']].apply(lambda x: float_weight if x['face'] == face else x['weight'], axis = 1)
+                self.__sides['weight'] = self.__sides[['face', 'weight']].apply(lambda x: float_weight if x['face'] == face else x['weight'], axis = 1)
             else:
                 print('Error: Invalid weight value. Weight must be numeric.')
         else:
             print('Error: Invalid face value.')
     
     def roll(self, rolls = 1):
-        roll_result = self.sides.sample(n = rolls, replace = True, weights = self.sides.weight)
+        '''
+        PURPOSE: simulates rolling a die n times and returning the outcome
+
+        INPUTS
+        rolls - int
+
+        OUTPUTS
+        outcomes - int
+        '''
+        roll_result = self.__sides.sample(n = rolls, replace = True, weights = self.__sides.weight)
         outcomes = roll_result['face'].values.tolist()
         return outcomes
     
     def show_sides(self):
-        return self.sides
+        '''
+        PURPOSE: returns all the sides of the die.
+
+        OUTPUTS
+        sides - pandas dataframe
+        '''
+        return self.__sides
 
 class Game:
+    '''
+    Python class to replicate a game of dice.
+    A Game object has a list of Die objects.
+
+    ATTRIBUTES:
+    dice - list of Die objects
+    __play_result - private pandas dataframe
+    '''
+
     def __init__(self, dice):
-        # check if need to validate dice
         self.dice = dice
     
     def play(self, rolls = 1):
+        '''
+        PURPOSE: Rolls each Die object n number of times
+        Latest results are saved in a private pandas dataframe __play_result
+
+        INPUTS:
+        rolls - int
+        '''
         dice = self.dice
         roll_results = []
-        for idx, die in enumerate(dice):
+        for die_index, die in enumerate(dice):
             die_result = die.roll(rolls = rolls)
-            for i, r in enumerate(die_result):
+            for roll_index, roll_outcome in enumerate(die_result):
                 roll_result = {
-                    'roll_number': i + 1,
-                    'die_number': idx,
-                    'face_value': r
+                    'roll_number': roll_index + 1,
+                    'die_number': die_index,
+                    'face_value': roll_outcome
                 }
                 roll_results.append(roll_result)
-        self.__play_result = pd.DataFrame(roll_results).sort_values(['roll_number']).set_index('roll_number')
+        self.__play_result = pd.DataFrame(roll_results).sort_values(['roll_number', 'die_number']).set_index('roll_number')
     
     def show_play_results(self, form = 'wide'):
+        '''
+        PURPOSE: Returns the private __play_result dataframe in eiher a wide or narrow format.
+        Narrow - two-column index of 'roll_number' and 'die_number'; column for 'face_value'
+        Wide - single column index of 'roll_number'; separate column for each die 'die_{n}'
+
+        INPUTS:
+        form - str; accepted values are 'wide' and 'narrow'; defaults to 'wide'
+
+        OUTPUTS:
+        __play_result - pandas dataframe
+        '''
         if form == 'wide':
+            # double check wide
             return self.__play_result
         elif form == 'narrow':
             return self.__play_result.reset_index().set_index(['roll_number', 'die_number'])
@@ -56,10 +112,32 @@ class Game:
             print('Error: Invalid form.')
 
 class Analyzer:
+    '''
+    Python class that analyzes the results of a Game object.
+    Jackpot - number of times a game resulted in all faces being identical
+    Combo - distinct combination of faces rolled
+    Face Counts per Roll - Number of times a given face is rolled in each event
+
+    ATTRIBUTES:
+    game - Game object
+    faces - list of str or numeric
+    jackpots - pandas dataframe
+    combos = pandas dataframe
+    face_counts = pandas dataframe
+    '''
+
     def __init__(self, game):
         self.game = game
+        self.faces = game.dice[0].sides.face.values.tolist()
     
     def jackpot(self):
+        '''
+        PURPOSE: computes the number of times a game results with all faces being identical
+        Tabular data is saved in the attribute 'jackpots'
+
+        OUTPUTS:
+        total_jackpots - int
+        '''
         play_results = self.game.show_play_results()
         roll_unique_faces = play_results.groupby('roll_number')['face_value'].nunique()
         jackpot_results = []
@@ -69,10 +147,14 @@ class Analyzer:
                 'jackpot': 1 if r == 1 else 0
             })
         self.jackpots = pd.DataFrame(jackpot_results).set_index('roll_number')
-        return self.jackpots.jackpot.sum().item()
+        total_jackpots = self.jackpots.jackpot.sum().item()
+        return total_jackpots
     
     def combo(self):
-        # check if die order matters
+        '''
+        PURPOSE: computes the distinct number of combinations rolled
+        Tabular data is saved in the attribute 'combos'
+        '''
         play_results = self.game.show_play_results()
         grouped = play_results.groupby('roll_number')['face_value'].agg(lambda x: sorted(list(x)))
 
@@ -86,7 +168,11 @@ class Analyzer:
         self.combos = combos_df.groupby(index_names).sum()
     
     def face_counts_per_roll(self):
-        faces = self.game.dice[0].sides.face.values.tolist() # move this to a cleaner place
+        '''
+        PURPOSE: computes the number of times a given face is rolled in each event
+        Tabular data is saved in the attribute 'face_counts'
+        '''
+        faces = self.game.faces
         play_results = self.game.show_play_results()
 
         all_faces = []
@@ -102,7 +188,8 @@ class Analyzer:
             .count().reset_index()\
                 .rename(columns = {'die_number': 'count'}).set_index('roll_number')
         
-        self.face_counts = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left').fillna(0).astype({'count': 'int32'})
+        self.face_counts = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left')\
+            .fillna(0).astype({'count': 'int32'})
 
 if __name__ == '__main__':
     sample_die = Die(faces = ['a', 'b', 'c'])
