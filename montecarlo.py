@@ -69,7 +69,6 @@ class Analyzer:
                 'jackpot': 1 if r == 1 else 0
             })
         self.jackpots = pd.DataFrame(jackpot_results).set_index('roll_number')
-        print(self.jackpots)
         return self.jackpots.jackpot.sum().item()
     
     def combo(self):
