@@ -64,11 +64,13 @@ class Game:
 
     ATTRIBUTES:
     dice - list of Die objects
+    faces - list of str or numeric
     __play_result - private pandas dataframe
     '''
 
     def __init__(self, dice):
         self.dice = dice
+        self.faces = dice[0].show_sides().face.values.tolist()
     
     def play(self, rolls = 1):
         '''
@@ -104,10 +106,14 @@ class Game:
         __play_result - pandas dataframe
         '''
         if form == 'wide':
-            # double check wide
-            return self.__play_result
+            # wide = self.__play_result.reset_index().set_index(['roll_number', 'die_number'])\
+            #     .face_value.unstack()
+            wide = self.__play_result.reset_index()\
+                .pivot(index = 'roll_number', columns = 'die_number', values = 'face_value')
+            return wide
         elif form == 'narrow':
-            return self.__play_result.reset_index().set_index(['roll_number', 'die_number'])
+            narrow = self.__play_result.reset_index().set_index(['roll_number', 'die_number'])
+            return narrow
         else:
             print('Error: Invalid form.')
 
@@ -120,7 +126,6 @@ class Analyzer:
 
     ATTRIBUTES:
     game - Game object
-    faces - list of str or numeric
     jackpots - pandas dataframe
     combos = pandas dataframe
     face_counts = pandas dataframe
@@ -128,7 +133,6 @@ class Analyzer:
 
     def __init__(self, game):
         self.game = game
-        self.faces = game.dice[0].sides.face.values.tolist()
     
     def jackpot(self):
         '''
@@ -138,7 +142,7 @@ class Analyzer:
         OUTPUTS:
         total_jackpots - int
         '''
-        play_results = self.game.show_play_results()
+        play_results = self.game.show_play_results(form = 'narrow')
         roll_unique_faces = play_results.groupby('roll_number')['face_value'].nunique()
         jackpot_results = []
         for i, r in roll_unique_faces.items():
@@ -155,7 +159,7 @@ class Analyzer:
         PURPOSE: computes the distinct number of combinations rolled
         Tabular data is saved in the attribute 'combos'
         '''
-        play_results = self.game.show_play_results()
+        play_results = self.game.show_play_results(form = 'narrow')
         grouped = play_results.groupby('roll_number')['face_value'].agg(lambda x: sorted(list(x)))
 
         num_dice = len(self.game.dice)
@@ -173,7 +177,7 @@ class Analyzer:
         Tabular data is saved in the attribute 'face_counts'
         '''
         faces = self.game.faces
-        play_results = self.game.show_play_results()
+        play_results = self.game.show_play_results(form = 'narrow').reset_index().set_index('roll_number')
 
         all_faces = []
         for i in play_results.index.unique().tolist():
@@ -206,7 +210,9 @@ if __name__ == '__main__':
     analyzer = Analyzer(game)
     print('---- combo ----')
     analyzer.combo()
+    print(analyzer.combos)
     print('---- face count ----')
     analyzer.face_counts_per_roll()
+    print(analyzer.face_counts)
     print('---- jackpot ----')
-    analyzer.jackpot()
+    print(analyzer.jackpot())
