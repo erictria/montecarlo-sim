@@ -13,6 +13,9 @@ class DieTestSuite(unittest.TestCase):
     def test_1_change_weight(self):
         '''
         PURPOSE: tests the Die.change_weight() method
+
+        OUTCOME:
+        The row in the dataframe with the specified face should have the new weight value
         '''
 
         die = Die(faces = ['a', 'b', 'c'])
@@ -20,7 +23,7 @@ class DieTestSuite(unittest.TestCase):
         face_to_change = 'a'
         die.change_weight(face = face_to_change, weight = new_weight)
 
-        sides = die.sides
+        sides = die.show_sides()
         changed_row = sides[(sides.face == face_to_change) & (sides.weight == new_weight)]
 
         self.assertTrue(len(changed_row) == 1, 'face weight not changed properly')
@@ -28,6 +31,9 @@ class DieTestSuite(unittest.TestCase):
     def test_2_change_weight_invalid_inputs(self):
         '''
         PURPOSE: tests the invalid inputs for Die.change_weight() 
+
+        OUTCOME:
+        Weights of the Die should not change after passing invalid face and weight inputs
         '''
 
         faces = ['a', 'b', 'c']
@@ -39,13 +45,17 @@ class DieTestSuite(unittest.TestCase):
         die.change_weight(face = invalid_face_to_change, weight = new_weight)
         die.change_weight(face = face_to_change, weight = invalid_new_weight)
 
-        sides = die.sides
+        sides = die.show_sides()
 
         self.assertTrue(sides.weight.values.tolist() == [1.0] * len(faces), 'invalid inputs still changed weight of die face')
     
     def test_3_roll(self):
         '''
         PURPOSE: tests the Die.roll() method
+
+        OUTCOMES:
+        The unique resulting faces should be a subset of the initial list of faces AND
+        The length of the resulting list should be equal to the total number of rolls
         '''
 
         faces = ['a', 'b', 'c']
@@ -60,6 +70,10 @@ class DieTestSuite(unittest.TestCase):
     def test_4_show_sides(self):
         '''
         PURPOSE: tests the Die.show_sides() method
+
+        OUTCOMES:
+        The faces of the created Die object should be equal to the initial list of faces AND
+        The weight of each side should be the default value of 1.0
         '''
 
         faces = ['a', 'b', 'c']
@@ -79,6 +93,9 @@ class GameTestSuite(unittest.TestCase):
     def test_1_play(self):
         '''
         PURPOSE: tests the Game.play() method
+
+        OUTCOMES:
+        The private attribute __play_result should not be accessible directly
         '''
 
         die = Die(faces = ['a', 'b', 'c'])
@@ -96,6 +113,9 @@ class GameTestSuite(unittest.TestCase):
     def test_2_show_play_results(self):
         '''
         PURPOSE: tests the Game.show_results() method
+
+        OUTCOMES:
+        The resulting wide dataframe should have a shape of M (rolls) rows x N (dice) columns
         '''
 
         die = Die(faces = ['a', 'b', 'c'])
@@ -105,11 +125,16 @@ class GameTestSuite(unittest.TestCase):
         game.play(rolls = rolls)
         latest_results = game.show_play_results()
 
-        self.assertTrue(len(latest_results) == (len(dice) * rolls), 'results returned an invalid play result')
+        self.assertTrue(latest_results.shape == (rolls, len(dice)), 'results returned an invalid play result')
     
     def test_3_show_play_results_inputs(self):
         '''
         PURPOSE: tests the valid inputs for the Game.show_results() method
+
+        OUTCOMES:
+        A 'wide' form dataframe should have 1 index AND
+        A 'narrow' form dataframe should have 2 indices AND
+        Any other form input should return None
         '''
 
         die = Die(faces = ['a', 'b', 'c'])
@@ -130,6 +155,9 @@ class AnalyzerTestSuite(unittest.TestCase):
     def test_1_jackpot(self):
         '''
         PURPOSE: tests the Analyzer.jackpot() method
+
+        OUTPUTS:
+        The jackpot method should return an int that is greater than or equal to 0
         '''
 
         die = Die(faces = ['a', 'b', 'c'])
@@ -143,6 +171,10 @@ class AnalyzerTestSuite(unittest.TestCase):
     def test_2_combo(self):
         '''
         PURPOSE: tests the Analyzer.combo() method
+
+        OUTCOMES:
+        The sum of the 'count' column should be equal to the total number of rolls AND
+        The number of indices of the resulting dataframe should be equal to the number of dice
         '''
 
         faces = ['a', 'b', 'c']
@@ -156,11 +188,15 @@ class AnalyzerTestSuite(unittest.TestCase):
         analyzer.combo()
         combos = analyzer.combos
 
-        self.assertTrue(combos['count'].sum().item() == rolls, 'combos attribute has an invalid value')
+        self.assertTrue(combos['count'].sum().item() == rolls and len(combos.index.names) == len(dice), 'combos attribute has an invalid value')
     
     def test_3_face_counts_per_roll(self):
         '''
         PURPOSE: tests the Analyzer.face_counts_per_roll() method
+
+        OUTCOMES:
+        The total sum of all face counts should be equal to the number of rolls x the number of dice AND
+        The shape of the resulting dataframe should be M (rolls) rows x N (faces) columns
         '''
 
         faces = ['a', 'b', 'c']
@@ -173,8 +209,7 @@ class AnalyzerTestSuite(unittest.TestCase):
 
         analyzer.face_counts_per_roll()
         face_counts = analyzer.face_counts
-
-        self.assertTrue(face_counts['count'].sum().item() == (rolls * len(dice)), 'face_counts attribute has an invalid value')
+        self.assertTrue(face_counts.sum().sum().item() == (rolls * len(dice)) and face_counts.shape == (rolls, len(faces)), 'face_counts attribute has an invalid value')
 
 if __name__ == '__main__':
     unittest.main(verbosity = 3)

@@ -76,7 +76,7 @@ class Game:
         '''
         PURPOSE: Rolls each Die object n number of times
         Latest results are saved in a private pandas dataframe __play_result
-        __play_result - index: ['roll_number']; columns: ['die_number', 'face_value']
+        __play_result - index: ['roll_number']; columns: different die numbers; shape: M (rolls) rows x N (dice) columns
 
         INPUTS:
         rolls - int
@@ -87,12 +87,12 @@ class Game:
             die_result = die.roll(rolls = rolls)
             for roll_index, roll_outcome in enumerate(die_result):
                 roll_result = {
-                    'roll_number': roll_index + 1,
+                    'roll_number': roll_index,
                     'die_number': die_index,
                     'face_value': roll_outcome
                 }
                 roll_results.append(roll_result)
-        self.__play_result = pd.DataFrame(roll_results).sort_values(['roll_number', 'die_number']).set_index('roll_number')
+        self.__play_result = pd.DataFrame(roll_results).pivot(index = 'roll_number', columns = 'die_number', values = 'face_value')
     
     def show_play_results(self, form = 'wide'):
         '''
@@ -107,14 +107,9 @@ class Game:
         __play_result - pandas dataframe
         '''
         if form == 'wide':
-            # wide = self.__play_result.reset_index().set_index(['roll_number', 'die_number'])\
-            #     .face_value.unstack()
-            wide = self.__play_result.reset_index()\
-                .pivot(index = 'roll_number', columns = 'die_number', values = 'face_value')
-            return wide
+            return self.__play_result
         elif form == 'narrow':
-            narrow = self.__play_result.reset_index().set_index(['roll_number', 'die_number'])
-            return narrow
+            return self.__play_result.stack().to_frame('face_value')
         else:
             print('Error: Invalid form.')
 
@@ -196,7 +191,7 @@ class Analyzer:
         3. Merge the dataframes from step 1 and step 2 and fill the NaN values with 0s.
         '''
         faces = self.game.faces
-        play_results = self.game.show_play_results(form = 'narrow').reset_index().set_index('roll_number')
+        play_results = self.game.show_play_results(form = 'narrow').reset_index(level = 'die_number')
 
         all_faces = []
         for i in play_results.index.unique().tolist():
@@ -208,16 +203,17 @@ class Analyzer:
         all_faces_df = pd.DataFrame(all_faces).set_index('roll_number')
 
         face_counts_df = play_results.groupby(['roll_number', 'face_value'])\
-            .count().reset_index()\
-                .rename(columns = {'die_number': 'count'}).set_index('roll_number')
+            .count().reset_index(level = 'face_value')\
+                .rename(columns = {'die_number': 'count'})
         
         self.face_counts = pd.merge(all_faces_df, face_counts_df, on = ['roll_number', 'face_value'], how = 'left')\
-            .fillna(0).astype({'count': 'int32'})
+            .fillna(0).astype({'count': 'int32'})\
+                .pivot(columns = 'face_value', values = 'count')
 
 if __name__ == '__main__':
-    sample_die = Die(faces = ['a', 'b', 'c'])
+    sample_die = Die(faces = ['a', 'b', 'c', 'd'])
     sample_die.change_weight(face = 'c', weight = 2.5)
-    sample_die_2 = Die(faces = ['a', 'b', 'c'])
+    sample_die_2 = Die(faces = ['a', 'b', 'c', 'd'])
 
     game = Game([sample_die, sample_die_2])
     game.play(rolls = 2)
