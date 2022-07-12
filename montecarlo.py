@@ -76,6 +76,7 @@ class Game:
         '''
         PURPOSE: Rolls each Die object n number of times
         Latest results are saved in a private pandas dataframe __play_result
+        __play_result - index: ['roll_number']; columns: ['die_number', 'face_value']
 
         INPUTS:
         rolls - int
@@ -139,6 +140,12 @@ class Analyzer:
         PURPOSE: computes the number of times a game results with all faces being identical
         Tabular data is saved in the attribute 'jackpots'
 
+        PROCESS:
+        1. Group the play results of the game by roll number to get the unique count of resulting faces
+        2. If the unique count is 1, tag 'jackpot' as 1. Otherwise, tag it as 0.
+        3. The dataframe would have 'roll_number' as an index and 'jackpot' as a column.
+        4. Get the sum of the 'jackpot' column to get the number of total jackpots.
+
         OUTPUTS:
         total_jackpots - int
         '''
@@ -158,6 +165,13 @@ class Analyzer:
         '''
         PURPOSE: computes the distinct number of combinations rolled
         Tabular data is saved in the attribute 'combos'
+
+        PROCESS:
+        1. Group the play results of the game by roll number and combine all resulting faces into a sorted list 
+            ['face_value_1', 'face_value_2', ...]
+        2. Create a list of new column names based on the number of dice in the game.
+        3. Create a dataframe using the lists from step 1 and the column names from step 2.
+        4. Aggregate the new dataframe to get the total 'count' per combination
         '''
         play_results = self.game.show_play_results(form = 'narrow')
         grouped = play_results.groupby('roll_number')['face_value'].agg(lambda x: sorted(list(x)))
@@ -175,6 +189,11 @@ class Analyzer:
         '''
         PURPOSE: computes the number of times a given face is rolled in each event
         Tabular data is saved in the attribute 'face_counts'
+
+        PROCESS:
+        1. Create a dataframe of all the possible face results per roll.
+        2. Create a dataframe of the total count of each face result per roll.
+        3. Merge the dataframes from step 1 and step 2 and fill the NaN values with 0s.
         '''
         faces = self.game.faces
         play_results = self.game.show_play_results(form = 'narrow').reset_index().set_index('roll_number')
