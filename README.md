@@ -105,4 +105,48 @@ roll_number
     3. **show_sides** - returns all the sides of the die
         - Output:
             1. *sides* - pandas dataframe representing the faces and weights of the die.
+
+#### Game Class
+- Replicates a game of dice.
+- Each game class has a list of dice with the **same** set of faces.
+- Attributes:
+    1. **dice** - a list of Die objects
+    2. **faces** - a list of string or numeric values representing the faces of all the dice
+- Methods:
+    1. **play** - rolls each Die object n number of times
+        - Parameters:
+            1. *rolls* - integer value signifying the number of times each die will be rolled
+    2. **show_play_results** - returns a pandas dataframe representing the latest results of a game
+        - Parameters:
+            1. *form* - string value signifying the format of the resulting dataframe. Valid values are 'wide' and 'narrow'
+        - Output:
+            1. *play_result* - pandas dataframe representing the latest results of a game
+
+#### Analyzer Class
+- Analyzes the results of a Game object.
+- Attributes:
+    1. **game** - a Game object
+    2. **jackpots** - a pandas dataframe containing the number of times a roll resulted in all faces being identical
+    3. **combos** - a pandas dataframe containing the frequency of distinct combinations rolled
+    4. **face_counts_per_roll** - a pandas dataframe containing the number of times a given face is rolled in each event
+- Methods:
+    1. **jackpot** - computes the jackpots of a game and stores it in a pandas dataframe
+        - Output:
+            1. *total_jackpots* - integer value representing the number of jackpots in a game
+    2. **combo** - computes the combos of a game and stores it in a pandas dataframe
+    3. **face_counts_per_roll** - computes the face counts per roll of a game and stores it in a pandas dataframe
+
 ### Manifest
+```
+montecarlo-sim/
+    montecarlo/
+        __init__.py
+        montecarlo.py
+        tests/
+            montecarlo_test.py
+    montecarlo_demo.ipynb
+    setup.py
+    LICENSE
+    README.md
+    .gitignore
+```
