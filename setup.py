@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name = 'Montecarlo Simulator',
+    name = 'montecarlo',
     version = '1.0',
     description = 'A package that implements a simple Monte Carlo simulator using a set of related classes',
     url = 'https://github.com/erictria/montecarlo-sim',
