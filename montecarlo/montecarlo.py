@@ -218,16 +218,27 @@ if __name__ == '__main__':
     game = Game([sample_die, sample_die_2])
     game.play(rolls = 2)
 
-    print('---- play results narrow ----')
-    print(game.show_play_results('narrow'))
-    print('---- play results wide ----')
-    print(game.show_play_results('wide'))
     analyzer = Analyzer(game)
-    print('---- combo ----')
+
+    print('---- Die.roll() ----')
+    print(sample_die.roll(rolls = 2))
+
+    print('\n---- Die.show_sides() ----')
+    print(sample_die.show_sides())
+
+    print('\n---- Game.show_play_results("narrow") ----')
+    print(game.show_play_results('narrow'))
+
+    print('\n---- Game.show_play_results("wide") ----')
+    print(game.show_play_results('wide'))
+
+    print('\n---- Analyzer.jackpot() ----')
+    print(analyzer.jackpot())
+
+    print('\n---- Analyzer.combo() ----')
     analyzer.combo()
     print(analyzer.combos)
-    print('---- face count ----')
+
+    print('\n---- Analyzer.face_counts_per_roll() ----')
     analyzer.face_counts_per_roll()
     print(analyzer.face_counts)
-    print('---- jackpot ----')
-    print(analyzer.jackpot())
