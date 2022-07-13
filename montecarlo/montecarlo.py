@@ -42,7 +42,7 @@ class Die:
         rolls - int
 
         OUTPUTS
-        outcomes - int
+        outcomes - list of str or numeric
         '''
         roll_result = self.__sides.sample(n = rolls, replace = True, weights = self.__sides.weight)
         outcomes = roll_result['face'].values.tolist()
