@@ -2,7 +2,7 @@
 
 ### Metadata
 - Project: Monte Carlo Simulator
-- Version: 1.0
+- Version: 0.1.0
 - Version Date: July 15, 2022
 - Author: Eric Tria
 - Email: ericmtria@gmail.com
@@ -12,8 +12,9 @@ This package implements a simple Monte Carlo simulator represented by a game of 
 A set of classes are used to replicate a game of dice and analyze its outcomes.
 
 #### Installing the Package
-1. Clone the repository from [Git](https://github.com/erictria/montecarlo-sim)
-2. Go into the root directory and run *pip install -e .*
+1. Fork the repository from [Git](https://github.com/erictria/montecarlo-sim)
+2. Clone your forked repository
+3. Go into the root directory and run *pip install -e .*
 
 ```bash
 git clone https://github.com/erictria/montecarlo-sim.git
@@ -22,10 +23,10 @@ pip install -e .
 ```
 
 #### Importing the Package
-- After installation, import the classes from *montecarlo.montecarlo*
+- After installation, import the classes from *montecarlo*
 
 ```python
-from montecarlo.montecarlo import (
+from montecarlo import (
     Die,
     Game,
     Analyzer
