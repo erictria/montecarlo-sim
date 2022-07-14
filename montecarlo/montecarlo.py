@@ -234,6 +234,7 @@ if __name__ == '__main__':
 
     print('\n---- Analyzer.jackpot() ----')
     print(analyzer.jackpot())
+    print(analyzer.jackpots)
 
     print('\n---- Analyzer.combo() ----')
     analyzer.combo()

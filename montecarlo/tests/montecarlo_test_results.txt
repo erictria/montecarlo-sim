@@ -1,0 +1,25 @@
+test_1_jackpot (__main__.AnalyzerTestSuite)
+PURPOSE: tests the Analyzer.jackpot() method ... ok
+test_2_combo (__main__.AnalyzerTestSuite)
+PURPOSE: tests the Analyzer.combo() method ... ok
+test_3_face_counts_per_roll (__main__.AnalyzerTestSuite)
+PURPOSE: tests the Analyzer.face_counts_per_roll() method ... ok
+test_1_change_weight (__main__.DieTestSuite)
+PURPOSE: tests the Die.change_weight() method ... ok
+test_2_change_weight_invalid_inputs (__main__.DieTestSuite)
+PURPOSE: tests the invalid inputs for Die.change_weight() ... ok
+test_3_roll (__main__.DieTestSuite)
+PURPOSE: tests the Die.roll() method ... ok
+test_4_show_sides (__main__.DieTestSuite)
+PURPOSE: tests the Die.show_sides() method ... ok
+test_1_play (__main__.GameTestSuite)
+PURPOSE: tests the Game.play() method ... ok
+test_2_show_play_results (__main__.GameTestSuite)
+PURPOSE: tests the Game.show_results() method ... ok
+test_3_show_play_results_inputs (__main__.GameTestSuite)
+PURPOSE: tests the valid inputs for the Game.show_results() method ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.036s
+
+OK

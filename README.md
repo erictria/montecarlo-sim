@@ -101,10 +101,20 @@ roll_number
         - Parameters:
             1. *rolls* - integer value signifying the number of times a die will be rolled
         - Output:
-            1. *outcomes* - list of string or numeric values representing the outcomes of rolling the die
+            1. *outcomes* - list of string or numeric values representing the outcomes of rolling the die. Example:
+                ```
+                ['c', 'b']
+                ```
     3. **show_sides** - returns all the sides of the die
         - Output:
-            1. *sides* - pandas dataframe representing the faces and weights of the die.
+            1. *sides* - pandas dataframe representing the faces and weights of the die. Example
+                ```
+                face  weight
+                    0    a     1.0
+                    1    b     1.0
+                    2    c     2.5
+                    3    d     1.0
+                ```
 
 #### Game Class
 - Replicates a game of dice.
@@ -120,15 +130,48 @@ roll_number
         - Parameters:
             1. *form* - string value signifying the format of the resulting dataframe. Valid values are 'wide' and 'narrow'
         - Output:
-            1. *play_result* - pandas dataframe representing the latest results of a game
+            1. *play_result* - pandas dataframe representing the latest results of a game. Example:
+                ```
+                # wide
+                die_number   0  1
+                roll_number      
+                0            c  d
+                1            b  b
+
+                # narrow
+                                    face_value
+                roll_number die_number           
+                0           0                   c
+                            1                   d
+                1           0                   b
+                            1                   b
+                ```
 
 #### Analyzer Class
 - Analyzes the results of a Game object.
 - Attributes:
     1. **game** - a Game object
-    2. **jackpots** - a pandas dataframe containing the number of times a roll resulted in all faces being identical
-    3. **combos** - a pandas dataframe containing the frequency of distinct combinations rolled
-    4. **face_counts_per_roll** - a pandas dataframe containing the number of times a given face is rolled in each event
+    2. **jackpots** - a pandas dataframe containing the number of times a roll resulted in all faces being identical. Example:
+        ```
+                     jackpot
+        roll_number         
+        0                  0
+        1                  0
+        ```
+    3. **combos** - a pandas dataframe containing the frequency of distinct combinations rolled. Example:
+        ```
+                       count
+        face_1 face_2       
+        a      d           1
+        b      c           1
+        ```
+    4. **face_counts_per_roll** - a pandas dataframe containing the number of times a given face is rolled in each event. Example:
+        ```
+        face_value   a  b  c  d
+        roll_number            
+        0            1  0  0  1
+        1            0  1  1  0
+        ```
 - Methods:
     1. **jackpot** - computes the jackpots of a game and stores it in a pandas dataframe
         - Output:
@@ -144,7 +187,9 @@ montecarlo-sim/
         montecarlo.py
         tests/
             montecarlo_test.py
+            montecarlo_test_results.txt
     montecarlo_demo.ipynb
+    final-project-submission.ipynb
     setup.py
     LICENSE
     README.md
