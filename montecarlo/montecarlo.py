@@ -28,7 +28,8 @@ class Die:
         if face in self.__sides['face'].values:
             if isinstance(weight, int) or isinstance(weight, float):
                 float_weight = float(weight)
-                self.__sides['weight'] = self.__sides[['face', 'weight']].apply(lambda x: float_weight if x['face'] == face else x['weight'], axis = 1)
+                self.__sides['weight'] = self.__sides[['face', 'weight']]\
+                    .apply(lambda x: float_weight if x['face'] == face else x['weight'], axis = 1)
             else:
                 print('Error: Invalid weight value. Weight must be numeric.')
         else:
@@ -92,7 +93,8 @@ class Game:
                     'face_value': roll_outcome
                 }
                 roll_results.append(roll_result)
-        self.__play_result = pd.DataFrame(roll_results).pivot(index = 'roll_number', columns = 'die_number', values = 'face_value')
+        self.__play_result = pd.DataFrame(roll_results)\
+            .pivot(index = 'roll_number', columns = 'die_number', values = 'face_value')
     
     def show_play_results(self, form = 'wide'):
         '''

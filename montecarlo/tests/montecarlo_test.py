@@ -148,7 +148,10 @@ class GameTestSuite(unittest.TestCase):
         narrow_play_results = game.show_play_results(form = 'narrow')
         invalid_play_results = game.show_play_results(form = 'other string')
 
-        self.assertTrue(len(wide_play_results.index.names) == 1 and len(narrow_play_results.index.names) == 2 and invalid_play_results is None, 'other')
+        self.assertTrue(
+            len(wide_play_results.index.names) == 1 and len(narrow_play_results.index.names) == 2 and invalid_play_results is None, 
+            'results returned an invalid result based on form input'
+        )
 
 class AnalyzerTestSuite(unittest.TestCase):
     '''
@@ -191,7 +194,10 @@ class AnalyzerTestSuite(unittest.TestCase):
         analyzer.combo()
         combos = analyzer.combos
 
-        self.assertTrue(combos['count'].sum().item() == rolls and len(combos.index.names) == len(dice), 'combos attribute has an invalid value')
+        self.assertTrue(
+            combos['count'].sum().item() == rolls and len(combos.index.names) == len(dice), 
+            'combos attribute has an invalid value'
+        )
     
     def test_3_face_counts_per_roll(self):
         '''
@@ -212,7 +218,10 @@ class AnalyzerTestSuite(unittest.TestCase):
 
         analyzer.face_counts_per_roll()
         face_counts = analyzer.face_counts
-        self.assertTrue(face_counts.sum().sum().item() == (rolls * len(dice)) and face_counts.shape == (rolls, len(faces)), 'face_counts attribute has an invalid value')
+        self.assertTrue(
+            face_counts.sum().sum().item() == (rolls * len(dice)) and face_counts.shape == (rolls, len(faces)), 
+            'face_counts attribute has an invalid value'
+        )
 
 if __name__ == '__main__':
     unittest.main(verbosity = 3)
