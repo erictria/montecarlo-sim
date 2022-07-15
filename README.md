@@ -159,7 +159,10 @@ roll_number
         0                  0
         1                  0
         ```
-    3. **combos** - a pandas dataframe containing the frequency of distinct combinations rolled. Example:
+    3. **combos** - a pandas dataframe containing the frequency of distinct combinations rolled.
+        - Note: this function generates **combinations**, meaning order does not matter. Different from permutations. [Reference](https://www.mathsisfun.com/combinatorics/combinations-permutations.html)
+        - Example:
+
         ```
                        count
         face_1 face_2       

@@ -12,6 +12,13 @@ class Die:
     default_weight = 1.0
 
     def __init__(self, faces):
+        '''
+        PURPOSE: creates a new Die object.
+        Sets the private __sides attribute of the newly created Die object
+
+        INPUTS:
+        faces - list of str or numeric types
+        '''
         self.__sides = pd.DataFrame({
             'face': faces,
             'weight': [self.default_weight] * len(faces)
@@ -65,11 +72,18 @@ class Game:
 
     ATTRIBUTES:
     dice - list of Die objects
-    faces - list of str or numeric
+    faces - list of str or numeric; faces of the dice in the game
     __play_result - private pandas dataframe
     '''
 
     def __init__(self, dice):
+        '''
+        PURPOSE: creates a new Game object.
+        Sets the public dice and faces attributes
+
+        INPUTS:
+        dice - list of Die objects
+        '''
         self.dice = dice
         self.faces = dice[0].show_sides().face.values.tolist()
     
@@ -130,6 +144,13 @@ class Analyzer:
     '''
 
     def __init__(self, game):
+        '''
+        PURPOSE: creates a new Analyzer object.
+        Sets the public game attribute
+
+        INPUTS:
+        game - Game object
+        '''
         self.game = game
     
     def jackpot(self):
